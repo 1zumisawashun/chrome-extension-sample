@@ -3,11 +3,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 
 export default defineContentScript({
-  matches: [
-    "https://meet.google.com/*",
-    "https://qiita.com/*",
-    "https://zenn.dev/*",
-  ],
+  matches: ["https://meet.google.com/*"],
   cssInjectionMode: "ui",
   async main(ctx) {
     const ui = await createShadowRootUi(ctx, {

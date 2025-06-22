@@ -8,6 +8,13 @@ export default defineConfig({
      * TODO:
      * scriptingを追加するとどうなるかは未確認
      * */
-    permissions: ["storage", "scripting", "activeTab", "tabs", "tabCapture"],
+    permissions: [
+      "storage",
+      "scripting",
+      "activeTab",
+      "tabs",
+      "tabCapture",
+      "desktopCapture",
+    ],
   },
 });
