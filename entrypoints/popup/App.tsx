@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import reactLogo from "@/assets/react.svg";
 import wxtLogo from "/wxt.svg";
 import "./App.css";
-import { COLOR, FONT_SIZE } from "../utils/constants";
+import Odometer from "react-odometerjs";
+import "odometer/themes/odometer-theme-default.css";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -31,42 +32,6 @@ function App() {
     };
   }, []); // 依存配列を追加してコンポーネントマウント時のみ実行
 
-  const handleColor = async () => {
-    try {
-      const response = await chrome.runtime.sendMessage({
-        type: "set-color",
-        color: COLOR.RED,
-      });
-      console.log("Color changed to:", response);
-    } catch (error) {
-      console.error("Error setting color:", error);
-    }
-  };
-
-  const handleFontSize = async () => {
-    try {
-      const response = await chrome.runtime.sendMessage({
-        type: "set-font-size",
-        fontSize: FONT_SIZE.L,
-      });
-      console.log("Font size changed to:", response);
-    } catch (error) {
-      console.error("Error setting font size:", error);
-    }
-  };
-
-  const handleIsEnabledStreaming = async () => {
-    try {
-      const response = await chrome.runtime.sendMessage({
-        type: "set-is-enabled-streaming",
-        isEnabledStreaming: true,
-      });
-      console.log("Is enabled streaming changed to:", response);
-    } catch (error) {
-      console.error("Error setting is enabled streaming:", error);
-    }
-  };
-
   return (
     <>
       <div>
@@ -78,7 +43,7 @@ function App() {
         </a>
       </div>
       <h1>WXT + React</h1>
-      <p>{count}</p>
+      <Odometer value={count} format="(.ddd),dd" />
       <div className="card">
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
