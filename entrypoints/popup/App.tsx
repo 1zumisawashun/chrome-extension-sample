@@ -5,9 +5,31 @@ import "./App.css";
 import { COLOR, FONT_SIZE } from "../utils/constants";
 
 function App() {
-  const [color, setColor] = useState(COLOR.RED);
-  const [fontSize, setFontSize] = useState(FONT_SIZE.M);
-  const [isEnabledStreaming, setIsEnabledStreaming] = useState(false);
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const fetchDataPeriodically = async () => {
+      try {
+        const url = import.meta.env.WXT_GAS_URL;
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log("Fetched data:", data);
+        setCount(data.count);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    // 初回実行
+    fetchDataPeriodically();
+
+    // 5秒毎に実行
+    const interval = setInterval(fetchDataPeriodically, 5000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []); // 依存配列を追加してコンポーネントマウント時のみ実行
 
   const handleColor = async () => {
     try {
@@ -45,22 +67,6 @@ function App() {
     }
   };
 
-  const reset = async () => {
-    await chrome.storage.local.clear();
-  };
-
-  function fetchData() {
-    chrome.storage.local.get(null, (data) => {
-      setColor(data.color);
-      setFontSize(data.fontSize);
-      setIsEnabledStreaming(data.isEnabledStreaming);
-    });
-  }
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   return (
     <>
       <div>
@@ -72,13 +78,7 @@ function App() {
         </a>
       </div>
       <h1>WXT + React</h1>
-
-      <button onClick={handleColor}>Color: {color}</button>
-      <button onClick={handleFontSize}>Font Size: {fontSize}</button>
-      <button onClick={handleIsEnabledStreaming}>
-        Is Enabled Streaming: {`${isEnabledStreaming}`}
-      </button>
-      <button onClick={reset}>Reset</button>
+      <p>{count}</p>
       <div className="card">
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR

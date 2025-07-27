@@ -4,7 +4,7 @@
 }
 
 body {
-  /* background-color: black; */
-  padding: 16px;
-  position: absolute;
+  background-color: black;
+  padding: 32px;
+  /* position: absolute; */
 }

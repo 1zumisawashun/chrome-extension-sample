@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, FC } from "react";
 import {
   ColorKeys,
   FontSizeKeys,
@@ -55,7 +55,7 @@ const observer = new MutationObserver(async (mutations: MutationRecord[]) => {
   }
 });
 
-export default () => {
+export const App: FC = () => {
   useEffect(() => {
     observer.observe(document.body, { subtree: true, childList: true });
     return () => observer.disconnect();

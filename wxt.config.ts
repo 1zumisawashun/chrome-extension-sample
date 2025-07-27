@@ -4,10 +4,14 @@ import { defineConfig } from "wxt";
 export default defineConfig({
   modules: ["@wxt-dev/module-react"],
   manifest: {
-    /**
-     * TODO:
-     * scriptingを追加するとどうなるかは未確認
-     * */
-    permissions: ["storage", "scripting", "activeTab", "tabs", "tabCapture"],
+    permissions: [
+      "storage",
+      "scripting",
+      "activeTab",
+      "tabs",
+      "contextMenus",
+      "webNavigation",
+    ],
+    host_permissions: ["https://script.google.com/*"],
   },
 });
