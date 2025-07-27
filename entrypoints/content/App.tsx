@@ -6,7 +6,7 @@ import {
   COLOR,
   THREAD,
   MESSAGE,
-} from "../utils/constants";
+} from "../background/constants";
 
 type Response = {
   isEnabledStreaming: boolean;

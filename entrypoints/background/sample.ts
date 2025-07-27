@@ -1,5 +1,5 @@
 import { injectComment } from "./inject-comment";
-import { STORAGE } from "../utils/constants";
+import { STORAGE } from "./constants";
 
 /**
  * TODO:
