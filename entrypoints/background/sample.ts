@@ -1,5 +1,5 @@
-import { injectComment } from "./inject-comment";
 import { STORAGE } from "./constants";
+import { injectComment } from "./inject-comment";
 
 /**
  * TODO:
@@ -11,79 +11,79 @@ import { STORAGE } from "./constants";
  * それか妥協案としてfocusタブを全て対象にして文字を流すとかならいけそう。正攻法で対応は無理そう
  */
 export default defineBackground(() => {
-  // WIPなので後ほど対応する
-  chrome.tabs.query({}, async (tabs) => {
-    tabs.forEach((tab) => {
-      if (!tab.id) return;
+	// WIPなので後ほど対応する
+	chrome.tabs.query({}, async (tabs) => {
+		tabs.forEach((tab) => {
+			if (!tab.id) return;
 
-      chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        func: (messageType) => {
-          console.log(messageType, "messageType");
-          const orig = navigator.mediaDevices.getDisplayMedia;
+			chrome.scripting.executeScript({
+				target: { tabId: tab.id },
+				func: (messageType) => {
+					console.log(messageType, "messageType");
+					const orig = navigator.mediaDevices.getDisplayMedia;
 
-          navigator.mediaDevices.getDisplayMedia = async function (...args) {
-            const stream = await orig.apply(this, args);
-            console.log("getDisplayMedia called", stream);
-            chrome.runtime.sendMessage({ type: messageType });
-            return stream;
-          };
-        },
-        args: ["tab-shared"],
-      });
-    });
-  });
+					navigator.mediaDevices.getDisplayMedia = async function (...args) {
+						const stream = await orig.apply(this, args);
+						console.log("getDisplayMedia called", stream);
+						chrome.runtime.sendMessage({ type: messageType });
+						return stream;
+					};
+				},
+				args: ["tab-shared"],
+			});
+		});
+	});
 
-  chrome.runtime.onMessage.addListener(
-    async (request, sender, sendResponse) => {
-      console.log("request:", request);
-      console.log("sender:", sender);
+	chrome.runtime.onMessage.addListener(
+		async (request, sender, _sendResponse) => {
+			console.log("request:", request);
+			console.log("sender:", sender);
 
-      if (chrome.runtime.lastError) {
-        console.error("Runtime error:", chrome.runtime.lastError);
-        return true;
-      }
-      if (request?.type === "tab-shared") {
-        console.log("tab-shared request received");
-      }
-      if (request?.type === "set-color") {
-        chrome.storage.local.set({ [STORAGE.Color]: request.color });
-        return true;
-      }
-      if (request?.type === "set-font-size") {
-        chrome.storage.local.set({ [STORAGE.FontSize]: request.fontSize });
-        return true;
-      }
-      if (request?.type === "set-is-enabled-streaming") {
-        chrome.storage.local.set({
-          [STORAGE.IsEnabledStreaming]: request.isEnabledStreaming,
-        });
-        return true;
-      }
-      if (request?.type === "chat-message") {
-        chrome.tabs.query(
-          { active: true, currentWindow: true },
-          async (tabs) => {
-            const tabId = tabs.at(0)?.id;
-            if (!tabId) return;
+			if (chrome.runtime.lastError) {
+				console.error("Runtime error:", chrome.runtime.lastError);
+				return true;
+			}
+			if (request?.type === "tab-shared") {
+				console.log("tab-shared request received");
+			}
+			if (request?.type === "set-color") {
+				chrome.storage.local.set({ [STORAGE.Color]: request.color });
+				return true;
+			}
+			if (request?.type === "set-font-size") {
+				chrome.storage.local.set({ [STORAGE.FontSize]: request.fontSize });
+				return true;
+			}
+			if (request?.type === "set-is-enabled-streaming") {
+				chrome.storage.local.set({
+					[STORAGE.IsEnabledStreaming]: request.isEnabledStreaming,
+				});
+				return true;
+			}
+			if (request?.type === "chat-message") {
+				chrome.tabs.query(
+					{ active: true, currentWindow: true },
+					async (tabs) => {
+						const tabId = tabs.at(0)?.id;
+						if (!tabId) return;
 
-            chrome.scripting.executeScript({
-              target: { tabId },
-              func: injectComment,
-              args: [
-                {
-                  message: request.message,
-                  fontSize: request.fontSize,
-                  color: request.color,
-                },
-              ],
-            });
-          }
-        );
-        return true;
-      }
-      console.log("no matching request type found", request);
-      return true;
-    }
-  );
+						chrome.scripting.executeScript({
+							target: { tabId },
+							func: injectComment,
+							args: [
+								{
+									message: request.message,
+									fontSize: request.fontSize,
+									color: request.color,
+								},
+							],
+						});
+					},
+				);
+				return true;
+			}
+			console.log("no matching request type found", request);
+			return true;
+		},
+	);
 });
