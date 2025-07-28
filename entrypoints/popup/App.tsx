@@ -55,8 +55,8 @@ export const App: FC = () => {
 	};
 
 	const progressPercentage = (() => {
-		// NOTE: 月次共有会に招待された人数
-		const totalInvited = 300;
+		// NOTE: 2025年6月の月次共有会の参加人数を仮決めとする
+		const totalInvited = 311;
 		const progress = (responseCount / totalInvited) * 100;
 		const width = `${Math.min(progress, 100)}%`;
 		const display = `${Math.round(progress)}%`;

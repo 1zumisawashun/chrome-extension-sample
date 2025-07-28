@@ -34,12 +34,11 @@ $ cp .env.local.sample .env.local
 - 拡張機能のアイコンを押下し popup が表示されることを確認する
 - npm run devを実行中は変更内容が即時反映される
 
-
 ## TODO
 
 - フローチャートを作成する
-- biome と lefthook を追加する
 - turborepoでモノレポにする
 - ディレクトリ構成の見直し
   - https://wxt.dev/guide/essentials/frontend-frameworks.html#multiple-apps
+- npm run buildで生成すれば拡張機能としてローカルサーバー立てなくても触れるのでignoreから外しておいた方がいいかも
 
