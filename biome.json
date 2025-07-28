@@ -6,6 +6,7 @@
 		"useIgnoreFile": false
 	},
 	"files": {
+		"includes": ["components/**", "entrypoints/**", "lib/**"],
 		"ignoreUnknown": false
 	},
 	"formatter": {
