@@ -11,7 +11,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { INIT_SETTING } from "./constants";
+import { INIT_SETTING } from "../helpers/constants";
 
 export const Setting: FC = () => {
 	const [setting, setSetting] = useState(INIT_SETTING);
