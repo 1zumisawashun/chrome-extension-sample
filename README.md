@@ -38,9 +38,5 @@ $ cp .env.local.sample .env.local
 
 - フローチャートを作成する
 - turborepoでモノレポにする
-- ディレクトリ構成の見直し
-  - https://wxt.dev/guide/essentials/frontend-frameworks.html#multiple-apps
 - npm run buildで生成すれば拡張機能としてローカルサーバー立てなくても触れるのでignoreから外しておいた方がいいかも
-- ~~popupを再表示した時に0から再カウントしているのでストアに保存しておく~~
-- settingタブを作る？何秒毎にフェッチをするかなど調整できるUIを作成する
 
