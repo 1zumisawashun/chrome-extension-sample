@@ -36,10 +36,37 @@ $ cp .env.local.sample .env.local
 
 ## TODO
 
-- フローチャートを作成する
 - turborepoでモノレポにする
   - BEはclaspの想定
 - テストを追加する
   - https://wxt.dev/guide/essentials/unit-testing.html
 - biomeのformatterを修正する
+- 不要かもわからないがbackground経由でも表示できるようにする
 
+## フローチャート
+
+```mermaid
+graph TD
+    subgraph 回答フロー
+        A[回答者] -- アンケートに回答 --> B(Google Form);
+        B -- 自動集約 --> C[<img src='[https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Microsoft_Office_Excel_%282019%E2%80%93present%29.svg/826px-Microsoft_Office_Excel_%282019%E2%80%93present%29.svg.png](https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Microsoft_Office_Excel_%282019%E2%80%93present%29.svg/826px-Microsoft_Office_Excel_%282019%E2%80%93present%29.svg.png)' width='20' /> Google Spreadsheet];
+    end
+
+    subgraph 表示フロー
+        D[閲覧者] -- アイコンクリック --> E{<img src='[https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Google_Chrome_icon_%28February_2022%29.svg/2048px-Google_Chrome_icon_%28February_2022%29.svg.png](https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Google_Chrome_icon_%28February_2022%29.svg/2048px-Google_Chrome_icon_%28February_2022%29.svg.png)' width='20' /> Chrome Extension};
+        E -- ポップアップ表示 --> F[popup.html];
+        F -- 10秒ごとに実行 --> G[APIリクエスト];
+        G -- 回答数を要求 --> H{<img src='[https://developers.google.com/apps-script/images/logo.png](https://developers.google.com/apps-script/images/logo.png)' width='20' /> Google Apps Script (GAS)};
+        H -- レスポンス（JSON形式） --> I[データ受信];
+        I -- 受け取ったデータを --> J[popup.htmlの表示を更新];
+    end
+
+    subgraph バックエンド処理
+        C -- データを参照 --> H;
+        H -- スプレッドシートの<br>回答数をカウント --> H;
+    end
+
+    style C fill:#D5E8D4,stroke:#82B366
+    style H fill:#DAE8FC,stroke:#6C8EBF
+    style F fill:#F8CECC,stroke:#B85450
+```
