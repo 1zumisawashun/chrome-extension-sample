@@ -1,28 +1,14 @@
 import { Clock, ExternalLink, RefreshCw, Users } from "lucide-react";
 import { type FC, useEffect, useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { INIT_RESPONSE, INIT_SETTING, URL } from "./constants";
 import { dateFormatter } from "./formatter";
 import { Odometer } from "./Odometer";
 
-const URL = {
-	googleAppsScript: import.meta.env.WXT_GAS_URL,
-	googleForm: import.meta.env.WXT_GOOGLE_FORM_URL,
-	googleSpreadsheet: import.meta.env.WXT_GOOGLE_SPREADSHEET_URL,
-};
-
-const YEAR_MONTH = dateFormatter(new Date(), "YYYY年M月");
-const LAST_UPDATED = dateFormatter(new Date(), "YYYY/MM/DD HH:mm:ss");
-
-// NOTE: 2025年6月の月次共有会の参加人数を仮決めとする
-const TOTAL_INVITED = import.meta.env.WXT_TOTAL_INVITED;
-
 export const Dashboard: FC = () => {
-	const [response, setResponse] = useState({
-		count: 0,
-		lastUpdated: LAST_UPDATED,
-	});
+	const [response, setResponse] = useState(INIT_RESPONSE);
+	const [setting, setSetting] = useState(INIT_SETTING);
 	const [isPending, setIsPending] = useState(false);
 
 	const fetchResponse = useCallback(async () => {
@@ -37,8 +23,10 @@ export const Dashboard: FC = () => {
 
 	useEffect(() => {
 		chrome.storage.local.get(["response"]).then((result) => {
-			console.log("Stored response:", result.response);
-			setResponse(result.response);
+			setResponse(result.response ?? INIT_RESPONSE);
+		});
+		chrome.storage.local.get(["setting"]).then((result) => {
+			setSetting(result.setting ?? INIT_SETTING);
 		});
 	}, []);
 
@@ -53,13 +41,19 @@ export const Dashboard: FC = () => {
 			}
 		};
 
-		// NOTE: 仮決めで10秒ごとにデータを取得する
-		const interval = setInterval(fetchDataPeriodically, 10000);
+		const interval = setInterval(fetchDataPeriodically, setting.fetchInterval);
 
 		return () => {
 			clearInterval(interval);
 		};
-	}, [fetchResponse]);
+	}, [fetchResponse, setting.fetchInterval]);
+
+	const progressbar = (() => {
+		const progress = (response.count / setting.totalInvited) * 100;
+		const width = `${Math.min(progress, 100)}%`;
+		const display = `${Math.round(progress)}%`;
+		return { width, display };
+	})();
 
 	const handleRefetch = async () => {
 		setIsPending(true);
@@ -74,26 +68,13 @@ export const Dashboard: FC = () => {
 		}
 	};
 
-	const progressbar = (() => {
-		const progress = (response.count / TOTAL_INVITED) * 100;
-		const width = `${Math.min(progress, 100)}%`;
-		const display = `${Math.round(progress)}%`;
-		return { width, display };
-	})();
-
 	return (
 		<Card className="shadow-lg border-0 gap-4">
 			<CardHeader className="gap-0">
 				<div className="flex items-center justify-between">
 					<CardTitle className="text-lg font-bold text-gray-800 leading-tight">
-						月次共有会
+						{setting?.title}
 					</CardTitle>
-					<Badge
-						variant="default"
-						className="bg-blue-100 text-blue-800 hover:bg-blue-100"
-					>
-						{YEAR_MONTH} 実施
-					</Badge>
 				</div>
 			</CardHeader>
 			<CardContent className="space-y-4">
