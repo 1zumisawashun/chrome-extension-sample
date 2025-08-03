@@ -15,38 +15,58 @@ const URL = {
 const YEAR_MONTH = dateFormatter(new Date(), "YYYY年M月");
 const LAST_UPDATED = dateFormatter(new Date(), "YYYY/MM/DD HH:mm:ss");
 
+// NOTE: 2025年6月の月次共有会の参加人数を仮決めとする
+const TOTAL_INVITED = import.meta.env.WXT_TOTAL_INVITED;
+
 export const App: FC = () => {
-	const [responseCount, setResponseCount] = useState(0);
-	const [lastUpdated, setLastUpdated] = useState(LAST_UPDATED);
+	const [response, setResponse] = useState({
+		count: 0,
+		lastUpdated: LAST_UPDATED,
+	});
 	const [isPending, setIsPending] = useState(false);
+
+	const fetchResponse = useCallback(async () => {
+		const response = await fetch(URL.googleAppsScript);
+		const json = await response.json();
+		const data = {
+			count: json.responseCount as number,
+			lastUpdated: dateFormatter(new Date(), "YYYY/MM/DD HH:mm:ss"),
+		};
+		return data;
+	}, []);
+
+	useEffect(() => {
+		chrome.storage.local.get(["response"]).then((result) => {
+			console.log("Stored response:", result.response);
+			setResponse(result.response);
+		});
+	}, []);
 
 	useEffect(() => {
 		const fetchDataPeriodically = async () => {
 			try {
-				const response = await fetch(URL.googleAppsScript);
-				const json = await response.json();
-				setResponseCount(json.responseCount);
-				setLastUpdated(dateFormatter(new Date(), "YYYY/MM/DD HH:mm:ss"));
+				const data = await fetchResponse();
+				setResponse(data);
+				chrome.storage.local.set({ response: data });
 			} catch (error) {
 				console.error("Error fetching data:", error);
 			}
 		};
 
-		// NOTE: 仮決めで5秒ごとにデータを取得する
-		const interval = setInterval(fetchDataPeriodically, 5000);
+		// NOTE: 仮決めで10秒ごとにデータを取得する
+		const interval = setInterval(fetchDataPeriodically, 10000);
 
 		return () => {
 			clearInterval(interval);
 		};
-	}, []);
+	}, [fetchResponse]);
 
 	const handleRefetch = async () => {
 		setIsPending(true);
 		try {
-			const response = await fetch(URL.googleAppsScript);
-			const json = await response.json();
-			setResponseCount(json.responseCount);
-			setLastUpdated(dateFormatter(new Date(), "YYYY/MM/DD HH:mm:ss"));
+			const data = await fetchResponse();
+			setResponse(data);
+			chrome.storage.local.set({ response: data });
 		} catch (error) {
 			console.error("Error refetching data:", error);
 		} finally {
@@ -54,10 +74,8 @@ export const App: FC = () => {
 		}
 	};
 
-	const progressPercentage = (() => {
-		// NOTE: 2025年6月の月次共有会の参加人数を仮決めとする
-		const totalInvited = 311;
-		const progress = (responseCount / totalInvited) * 100;
+	const progressbar = (() => {
+		const progress = (response.count / TOTAL_INVITED) * 100;
 		const width = `${Math.min(progress, 100)}%`;
 		const display = `${Math.round(progress)}%`;
 		return { width, display };
@@ -87,26 +105,26 @@ export const App: FC = () => {
 							<span className="text-sm font-medium">アンケート回答数</span>
 						</div>
 						<div className="text-3xl font-bold">
-							<Odometer value={responseCount} format="(.ddd),dd" />
+							<Odometer value={response.count} format="(.ddd),dd" />
 						</div>
 					</div>
 
 					<div className="space-y-2">
 						<div className="flex justify-between text-sm text-gray-600">
 							<span>進捗状況</span>
-							<span>{progressPercentage.display}</span>
+							<span>{progressbar.display}</span>
 						</div>
 						<div className="w-full bg-gray-200 rounded-full h-2">
 							<div
 								className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-300"
-								style={{ width: progressPercentage.width }}
+								style={{ width: progressbar.width }}
 							/>
 						</div>
 					</div>
 
 					<div className="flex items-center gap-2 text-xs text-gray-500">
 						<Clock className="h-3 w-3" />
-						<span>最終更新: {lastUpdated}</span>
+						<span>最終更新: {response.lastUpdated}</span>
 					</div>
 
 					<div className="grid grid-cols-2 gap-2 pt-2">
