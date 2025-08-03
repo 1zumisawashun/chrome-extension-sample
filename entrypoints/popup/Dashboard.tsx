@@ -3,7 +3,7 @@ import { type FC, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { INIT_RESPONSE, INIT_SETTING, URL } from "./constants";
-import { dateFormatter } from "./formatter";
+import { dateFormatter } from "./formatters";
 import { Odometer } from "./Odometer";
 
 export const Dashboard: FC = () => {

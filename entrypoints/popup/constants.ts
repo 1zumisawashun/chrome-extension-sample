@@ -1,4 +1,4 @@
-import { dateFormatter } from "./formatter";
+import { dateFormatter } from "./formatters";
 
 export const URL = {
 	googleAppsScript: import.meta.env.WXT_GAS_URL,
