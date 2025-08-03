@@ -13,6 +13,7 @@ export default defineConfig({
 	vite: () => ({
 		plugins: [tailwindcss()],
 	}),
+	outDirTemplate:"{{browser}}-mv{{manifestVersion}}-{{mode}}",
 	manifest: {
 		permissions: [
 			"storage",

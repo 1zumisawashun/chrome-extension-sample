@@ -29,7 +29,7 @@ $ cp .env.local.sample .env.local
 - chrome://extensions/ に遷移する
 - デベロッパーモード のトグルをONにする
 - パッケージ化されていない拡張機能を読み込む を押下する
-- npm run dev で .output/chrome-mv3-dev が生成されているので、そちらをアップロードする（cmd + shift + . で隠しフォルダが表示されます）
+- npm run dev で .output/chrome-mv3-development が生成されているので、そちらをアップロードする（cmd + shift + . で隠しフォルダが表示されます）
 - 読み込み完了後 chrome://extensions/ に拡張機能が追加されていることを確認する
 - 拡張機能のアイコンを押下し popup が表示されることを確認する
 - npm run devを実行中は変更内容が即時反映される
@@ -41,4 +41,5 @@ $ cp .env.local.sample .env.local
   - BEはclaspの想定
 - テストを追加する
   - https://wxt.dev/guide/essentials/unit-testing.html
+- biomeのformatterを修正する
 
