@@ -38,5 +38,7 @@ $ cp .env.local.sample .env.local
 
 - フローチャートを作成する
 - turborepoでモノレポにする
-- npm run buildで生成すれば拡張機能としてローカルサーバー立てなくても触れるのでignoreから外しておいた方がいいかも
+  - BEはclaspの想定
+- テストを追加する
+  - https://wxt.dev/guide/essentials/unit-testing.html
 
