@@ -24,7 +24,9 @@ $ npm run dev
 $ cp .env.local.sample .env.local
 ```
 
-## 拡張機能
+# 手順
+
+## Chrome Extension
 
 - chrome://extensions/ に遷移する
 - デベロッパーモード のトグルをONにする
@@ -33,6 +35,32 @@ $ cp .env.local.sample .env.local
 - 読み込み完了後 chrome://extensions/ に拡張機能が追加されていることを確認する
 - 拡張機能のアイコンを押下し popup が表示されることを確認する
 - npm run devを実行中は変更内容が即時反映される
+
+※ .output/chrome-mv3-production をアップロードした場合は npm run dev しなくても拡張機能が動きます
+
+## Google Apps Script
+
+https://script.google.com/ で任意のプロジェクトに以下のコードを貼り付ける
+
+
+```ts
+function doGet(e) {
+  const spreadSheetId = ScriptProperties.getProperty('SPREAD_SHEET_ID');
+  const sheetName = ScriptProperties.getProperty("SHEET_NAME")
+
+  const spreadSheet = SpreadsheetApp.openById(spreadSheetId)
+  const sheet = spreadSheet.getSheetByName(sheetName)
+
+  const responseCount = sheet.getLastRow() - 1
+  const output = JSON.stringify({status: "OK", responseCount })
+
+  Logger.log(output)
+
+  return ContentService.createTextOutput(output).setMimeType(ContentService.MimeType.JSON);
+}
+```
+
+任意のプロジェクトのスクリプトプロパティにSPREAD_SHEET_IDとSHEET_NAMEを追加する
 
 ## TODO
 
@@ -43,30 +71,3 @@ $ cp .env.local.sample .env.local
 - biomeのformatterを修正する
 - 不要かもわからないがbackground経由でも表示できるようにする
 
-## フローチャート
-
-```mermaid
-graph TD
-    subgraph 回答フロー
-        A[回答者] -- アンケートに回答 --> B(Google Form);
-        B -- 自動集約 --> C[<img src='[https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Microsoft_Office_Excel_%282019%E2%80%93present%29.svg/826px-Microsoft_Office_Excel_%282019%E2%80%93present%29.svg.png](https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Microsoft_Office_Excel_%282019%E2%80%93present%29.svg/826px-Microsoft_Office_Excel_%282019%E2%80%93present%29.svg.png)' width='20' /> Google Spreadsheet];
-    end
-
-    subgraph 表示フロー
-        D[閲覧者] -- アイコンクリック --> E{<img src='[https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Google_Chrome_icon_%28February_2022%29.svg/2048px-Google_Chrome_icon_%28February_2022%29.svg.png](https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Google_Chrome_icon_%28February_2022%29.svg/2048px-Google_Chrome_icon_%28February_2022%29.svg.png)' width='20' /> Chrome Extension};
-        E -- ポップアップ表示 --> F[popup.html];
-        F -- 10秒ごとに実行 --> G[APIリクエスト];
-        G -- 回答数を要求 --> H{<img src='[https://developers.google.com/apps-script/images/logo.png](https://developers.google.com/apps-script/images/logo.png)' width='20' /> Google Apps Script (GAS)};
-        H -- レスポンス（JSON形式） --> I[データ受信];
-        I -- 受け取ったデータを --> J[popup.htmlの表示を更新];
-    end
-
-    subgraph バックエンド処理
-        C -- データを参照 --> H;
-        H -- スプレッドシートの<br>回答数をカウント --> H;
-    end
-
-    style C fill:#D5E8D4,stroke:#82B366
-    style H fill:#DAE8FC,stroke:#6C8EBF
-    style F fill:#F8CECC,stroke:#B85450
-```
